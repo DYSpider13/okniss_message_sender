@@ -40,8 +40,33 @@ with open(paramFile, "r") as f:
     try:
         params = json.load(f)
     except:
-        print("Error reading params from file. Exiting")
+        print("Error reading params from file")
+        print("Param file should be a json file")
+        print("Exiting ! ")
         sys.exit(0)
+
+# Check format
+if "username" not in params or "pwd" not in params:
+    print("username or pwd missing from param file.")
+    print("can't send messages like that ! ")
+    print("Exiting ! ")
+
+    sys.exit(0)
+
+if "limit" not in params:
+    limit = 40
+else:
+    limit = params["limit"]
+
+if "messageFrench" not in params:
+    message = ""
+else:
+    message = params["messageFrench"]
+
+if "category" not in params:
+    category = "all"
+else:
+    category = params["category"].lower()
 
 
 url = "https://www.ouedkniss.com/cours-r"
@@ -81,7 +106,7 @@ while True:
         except:
             continue
 
-        if params["category"].lower() not in cat.lower():
+        if category != "all" and category not in cat.lower():
             print("Category is " + cat + " --> Passing")
             continue
 
@@ -124,7 +149,7 @@ while True:
 
         if checkDateCondition(last_time) == False or len(msgs) == 0:
             textField = driver.find_element_by_xpath("//textarea")
-            textField.send_keys(params["messageFrench"])
+            textField.send_keys(message)
             #textField.send_keys(Keys.ENTER)
             driver.execute_script("document.getElementById('envoyer').click()")
             cnt = cnt + 1
@@ -137,7 +162,7 @@ while True:
         driver.execute_script("document.getElementsByClassName('CloseChat')[0].click()")
 
 
-    if cnt == params["limit"]:
+    if cnt == limit:
         break
     
     # go to second page
